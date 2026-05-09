@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cardano DAO Contract Agent — Presentation</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,400;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #080c10;
+  --bg2:      #0d1520;
+  --bg3:      #111c2e;
+  --border:   #1a2d45;
+  --border2:  #1f3a5f;
+  --text:     #d4e4f7;
+  --text2:    #7a9bbf;
+  --text3:    #3d6080;
+  --accent:   #00d4ff;
+  --accent2:  #0099cc;
+  --green:    #00e676;
+  --green2:   #00b050;
+  --amber:    #ffc107;
+  --red:      #ff4444;
+  --purple:   #b388ff;
+  --glow:     0 0 30px rgba(0,212,255,0.15);
+  --glow2:    0 0 60px rgba(0,212,255,0.08);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  width: 100%; height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Be Vietnam Pro', sans-serif;
+  overflow: hidden;
+  cursor: default;
+}
+
+/* ── GRID BACKGROUND ── */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── SLIDES WRAPPER ── */
+#deck {
+  width: 100vw; height: 100vh;
+  position: relative; z-index: 1;
+}
+
+.slide {
+  position: absolute; inset: 0;
+  display: flex; flex-direction: column;
+  padding: 48px 64px;
+  opacity: 0;
+  transform: translateX(60px);
+  transition: opacity .5s ease, transform .5s ease;
+  pointer-events: none;
+  overflow: hidden;
+}
+.slide.active {
+  opacity: 1; transform: translateX(0);
+  pointer-events: all;
+}
+.slide.exit {
+  opacity: 0; transform: translateX(-60px);
+  pointer-events: none;
+}
+
+/* ── SLIDE HEADER ── */
+.slide-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .7rem;
+  color: var(--accent);
+  letter-spacing: .15em;
+  text-transform: uppercase;
+  margin-bottom: 12px;
+  opacity: .7;
+}
+.slide h1 {
+  font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.slide h1 span { color: var(--accent); }
+.slide h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 20px;
+}
+.slide .sub {
+  font-size: 1rem; color: var(--text2);
+  margin-bottom: 32px;
+  max-width: 700px;
+  line-height: 1.7;
+}
+
+/* ── CARDS ── */
+.cards { display: flex; gap: 16px; flex-wrap: wrap; flex: 1; align-items: flex-start; }
+.card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px 22px;
+  flex: 1; min-width: 200px;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--accent), transparent);
+}
+.card.green::before { background: linear-gradient(90deg, var(--green), transparent); }
+.card.purple::before { background: linear-gradient(90deg, var(--purple), transparent); }
+.card.amber::before { background: linear-gradient(90deg, var(--amber), transparent); }
+.card.red::before { background: linear-gradient(90deg, var(--red), transparent); }
+
+.card-num {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.8rem; font-weight: 700;
+  color: var(--accent); opacity: .15;
+  position: absolute; top: 12px; right: 16px;
+}
+.card h3 { font-size: .85rem; color: var(--text2); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 8px; }
+.card p, .card li { font-size: .88rem; color: var(--text); line-height: 1.6; }
+.card ul { list-style: none; padding: 0; }
+.card ul li::before { content: '→ '; color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+.card.green ul li::before { color: var(--green); }
+.card.purple ul li::before { color: var(--purple); }
+.card.amber ul li::before { color: var(--amber); }
+
+/* ── CODE BLOCKS ── */
+.code-block {
+  background: #050810;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .78rem;
+  color: #a8c4e0;
+  line-height: 1.7;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+.code-block .kw  { color: var(--accent); }
+.code-block .fn  { color: #79d4b3; }
+.code-block .st  { color: #f4a26b; }
+.code-block .cm  { color: var(--text3); font-style: italic; }
+.code-block .hl  { background: rgba(0,212,255,.08); border-left: 2px solid var(--accent); padding-left: 6px; }
+.code-block .ok  { color: var(--green); }
+.code-block .err { color: var(--red); }
+
+/* ── PIPELINE ── */
+.pipeline {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin: 24px 0;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+.pipe-node {
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: 10px;
+  padding: 14px 18px;
+  text-align: center;
+  min-width: 110px;
+  flex-shrink: 0;
+  position: relative;
+}
+.pipe-node.accent { border-color: var(--accent); box-shadow: var(--glow); }
+.pipe-node.green2 { border-color: var(--green); }
+.pipe-node.red2   { border-color: var(--red); }
+.pipe-node .pn-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .62rem; color: var(--text3);
+  text-transform: uppercase; letter-spacing: .08em;
+  margin-bottom: 4px;
+}
+.pipe-node .pn-name { font-size: .82rem; font-weight: 700; color: var(--text); }
+.pipe-node .pn-sub  { font-size: .68rem; color: var(--text2); margin-top: 3px; }
+.pipe-arrow {
+  color: var(--text3);
+  font-size: 1.1rem;
+  padding: 0 6px;
+  flex-shrink: 0;
+}
+.pipe-arrow.green { color: var(--green); }
+.pipe-arrow.red   { color: var(--red); }
+
+/* ── LOOP DIAGRAM ── */
+.loop-diagram {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  flex: 1;
+}
+.loop-box {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 18px;
+}
+.loop-box h4 {
+  font-size: .8rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 12px;
+}
+.loop-box.inner h4 { color: var(--purple); }
+.loop-box.outer h4 { color: var(--red); }
+
+/* ── TABLE ── */
+.compare-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .82rem;
+  flex: 1;
+}
+.compare-table th {
+  background: var(--bg3);
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  padding: 10px 14px;
+  text-align: left;
+  border-bottom: 1px solid var(--border2);
+}
+.compare-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
+  vertical-align: top;
+}
+.compare-table tr:hover td { background: rgba(0,212,255,.03); }
+.tag {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .7rem;
+}
+.tag-pass { background: #0d2e1a; color: var(--green); border: 1px solid #1a5c30; }
+.tag-warn { background: #2e2000; color: var(--amber); border: 1px solid #5c3d00; }
+.tag-new  { background: #1a0d33; color: var(--purple); border: 1px solid #3d1a66; }
+
+/* ── TIMELINE / STEPS ── */
+.steps { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+.step-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+.step-num {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .75rem; color: var(--accent);
+  flex-shrink: 0;
+}
+.step-content h4 { font-size: .9rem; font-weight: 700; color: var(--text); margin-bottom: 3px; }
+.step-content p  { font-size: .8rem; color: var(--text2); line-height: 1.5; }
+.step-content code {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .75rem;
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 2px 6px;
+  color: var(--accent);
+}
+
+/* ── PITCH QUOTE ── */
+.pitch-quote {
+  background: var(--bg2);
+  border-left: 3px solid var(--accent);
+  border-radius: 0 12px 12px 0;
+  padding: 20px 24px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .9rem;
+  color: var(--text);
+  line-height: 1.8;
+  margin: 16px 0;
+}
+.pitch-quote em { color: var(--accent); font-style: normal; }
+
+/* ── NAV ── */
+#nav {
+  position: fixed;
+  bottom: 28px; left: 50%;
+  transform: translateX(-50%);
+  display: flex; align-items: center; gap: 12px;
+  background: rgba(8,12,16,.85);
+  border: 1px solid var(--border2);
+  border-radius: 50px;
+  padding: 8px 16px;
+  backdrop-filter: blur(12px);
+  z-index: 100;
+}
+#nav button {
+  background: none; border: none;
+  color: var(--text2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .75rem;
+  cursor: pointer;
+  padding: 4px 10px;
+  border-radius: 20px;
+  transition: all .2s;
+}
+#nav button:hover { color: var(--accent); background: rgba(0,212,255,.08); }
+#slide-counter {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .72rem; color: var(--text3);
+  min-width: 60px; text-align: center;
+}
+.dot-row { display: flex; gap: 5px; align-items: center; }
+.dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--border2); cursor: pointer;
+  transition: all .2s;
+}
+.dot.on { background: var(--accent); width: 14px; border-radius: 3px; }
+
+/* ── COVER SLIDE ── */
+#slide-cover {
+  justify-content: center;
+}
+#slide-cover .cover-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .72rem;
+  color: var(--accent);
+  border: 1px solid var(--border2);
+  border-radius: 20px;
+  padding: 5px 14px;
+  display: inline-block;
+  margin-bottom: 24px;
+  letter-spacing: .12em;
+}
+#slide-cover h1 {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  margin-bottom: 16px;
+}
+#slide-cover .tagline {
+  font-size: 1.1rem;
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.7;
+  margin-bottom: 40px;
+}
+.tech-pills { display: flex; gap: 10px; flex-wrap: wrap; }
+.pill {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .7rem;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  padding: 5px 12px;
+  border-radius: 4px;
+  letter-spacing: .06em;
+}
+
+/* ── GLOW ACCENT ── */
+.glow-text { text-shadow: 0 0 20px rgba(0,212,255,.4); color: var(--accent); }
+
+/* ── RAG DIAGRAM ── */
+.rag-grid {
+  display: grid;
+  grid-template-columns: 1fr 40px 1fr;
+  gap: 0;
+  align-items: start;
+  flex: 1;
+}
+.rag-col { display: flex; flex-direction: column; gap: 10px; }
+.rag-arrow-col {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding-top: 60px; gap: 24px;
+  color: var(--text3); font-size: 1.2rem;
+}
+.rag-item {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 14px;
+  font-size: .8rem;
+  color: var(--text);
+}
+.rag-item .ri-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: .62rem;
+  color: var(--text3);
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  margin-bottom: 4px;
+}
+
+/* ── CHECKLIST ── */
+.checklist { display: flex; flex-direction: column; gap: 8px; }
+.check-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: .84rem;
+}
+.check-icon { font-size: .9rem; flex-shrink: 0; margin-top: 1px; }
+.check-item strong { color: var(--text); font-weight: 600; }
+.check-item span { color: var(--text2); font-size: .78rem; display: block; margin-top: 2px; }
+
+/* ── FINAL SLIDE ── */
+#slide-final { justify-content: center; text-align: center; align-items: center; }
+#slide-final h1 { font-size: clamp(2rem, 4vw, 3rem); margin-bottom: 20px; }
+#slide-final .pitch-quote { text-align: left; max-width: 700px; }
+</style>
+</head>
+<body>
+
+<div id="deck">
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 1 — COVER
+══════════════════════════════════════════════════ -->
+<section class="slide active" id="slide-cover">
+  <div class="cover-badge">HACKATHON 2025 · CARDANO TRACK</div>
+  <h1>Cardano DAO<br><span>Contract Agent</span></h1>
+  <p class="tagline">
+    Hệ thống AI đa tác nhân tự động sinh và kiểm chứng<br>
+    hợp đồng thông minh Marlowe trên Cardano Blockchain.
+  </p>
+  <div class="tech-pills">
+    <span class="pill">Marlowe DSL</span>
+    <span class="pill">Cyclic State Graph</span>
+    <span class="pill">Formal Verification</span>
+    <span class="pill">RAG · Qdrant</span>
+    <span class="pill">Intent Alignment</span>
+    <span class="pill">Preview Testnet</span>
+    <span class="pill">Python · FastAPI</span>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 2 — VẤN ĐỀ
+══════════════════════════════════════════════════ -->
+<section class="slide" id="slide-problem">
+  <div class="slide-label">01 · Vấn đề</div>
+  <h1>LLM <span>không đủ</span> để<br>sinh hợp đồng on-chain</h1>
+  <p class="sub">Hợp đồng Marlowe trên Cardano cần đúng tuyệt đối — một lỗi logic = ADA bị khóa vĩnh viễn. LLM đơn thuần không thể đảm bảo điều này.</p>
+  <div class="cards">
+    <div class="card red">
+      <div class="card-num">01</div>
+      <h3>Hallucination</h3>
+      <ul>
+        <li>LLM "trông có vẻ đúng"</li>
+        <li>Không thể kiểm chứng logic</li>
+        <li>Timeout sai thứ tự → ADA stuck</li>
+      </ul>
+    </div>
+    <div class="card red">
+      <div class="card-num">02</div>
+      <h3>Intent Drift</h3>
+      <ul>
+        <li>User nói 60% → code sinh 50%</li>
+        <li>Không có cơ chế phát hiện</li>
+        <li>Contract pass spec nhưng sai nghĩa</li>
+      </ul>
+    </div>
+    <div class="card red">
+      <div class="card-num">03</div>
+      <h3>No Traceability</h3>
+      <ul>
+        <li>Hộp đen hoàn toàn</li>
+        <li>Không biết rule nào được áp dụng</li>
+        <li>Không thể audit sau deploy</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 3 — GIẢI PHÁP TỔNG QUAN
+══════════════════════════════════════════════════ -->
+<section class="slide" id="slide-solution">
+  <div class="slide-label">02 · Giải pháp</div>
+  <h1>Hybrid: <span>LLM + Formal</span><br>Verification</h1>
+  <p class="sub">LLM đảm nhiệm hiểu ngôn ngữ và sinh code. Formal checker đảm nhiệm kiểm chứng. Hai thứ không bao giờ bị nhầm lẫn.</p>
+  <div class="cards">
+    <div class="card">
+      <h3>LLM làm gì</h3>
+      <ul>
+        <li>Đọc hiểu tiếng Việt (Node 1)</li>
+        <li>Định hình cấu trúc logic (Node 2)</li>
+        <li>Sinh mã Marlowe DSL (Node 3)</li>
+        <li>Giải thích lỗi cho user (Node 4)</li>
+      </ul>
+    </div>
+    <div class="card green">
+      <h3>Formal checker làm gì</h3>
+      <ul>
+        <li>Kiểm tra mọi nhánh có Close</li>
+        <li>Timeout ordering theo spec §4.2</li>
+        <li>Số dư không âm (ledger rule)</li>
+        <li>PASS/FAIL — không phải LLM đoán</li>
+      </ul>
+    </div>
+    <div class="card purple">
+      <h3>Intent Alignment</h3>
+      <ul>
+        <li>Snapshot ý định tại Node 1</li>
+        <li>So sánh AST với snapshot</li>
+        <li>Chạy TRƯỚC formal checker</li>
+        <li>Back-translation cho user confirm</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 4 — KIẾN TRÚC CYCLIC STATE GRAPH
+══════════════════════════════════════════════════ -->
+<section class="slide" id="slide-arch">
+  <div class="slide-label">03 · Kiến trúc</div>
+  <h1>Cyclic <span>State Graph</span></h1>
+  <p class="sub">Không Node nào giao tiếp trực tiếp. Tất cả đọc/ghi qua Shared State. Debugging Loop tự động.</p>
+
+  <div class="pipeline">
+    <div class="pipe-node">
+      <div class="pn-label">Input</div>
+      <div class="pn-name">User</div>
+      <div class="pn-sub">Tiếng Việt</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-node accent">
+      <div class="pn-label">Node 1</div>
+      <div class="pn-name">Intent</div>
+      <div class="pn-sub">Parse + Snapshot</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-node accent">
+      <div class="pn-label">Node 2</div>
+      <div class="pn-name">Logic</div>
+      <div class="pn-sub">Game Theory</div>
+    </div>
+    <div class="pipe-arrow">→</div>
+    <div class="pipe-node accent">
+      <div class="pn-label">Node 3</div>
+      <div class="pn-name">Marlowe</div>
+      <div class="pn-sub">DSL Generator</div>
+    </div>
+    <div class="pipe-arrow green">→</div>
+    <div class="pipe-node" style="border-color:var(--purple)">
+      <div class="pn-label">Check</div>
+      <div class="pn-name">Intent</div>
+      <div class="pn-sub">Alignment</div>
+    </div>
+    <div class="pipe-arrow green">→</div>
+    <div class="pipe-node red2">
+      <div class="pn-label">Node 4</div>
+      <div class="pn-name">Formal</div>
+      <div class="pn-sub">Verifier</div>
+    </div>
+    <div class="pipe-arrow green">→</div>
+    <div class="pipe-node" style="border-color:var(--green)">
+      <div class="pn-label">Output</div>
+      <div class="pn-name">Deploy</div>
+      <div class="pn-sub">Sign & Submit</div>
+    </div>
+  </div>
+
+  <div class="loop-diagram" style="margin-top:8px">
+    <div class="loop-box inner">
+      <h4>🔁 Vòng lặp trong — Intent Loop</h4>
+      <p style="font-size:.82rem;color:var(--text2);line-height:1.6">
+        Node 2 → Node 3 → Intent Check → nếu fail quay về <strong>Node 2</strong> re-generate blueprint.<br>
+        Lỗi: sai parties count, sai share, sai deadline.<br>
+        Max <code style="color:var(--purple)">5 retries</code> trước khi hỏi lại user.
+      </p>
+    </div>
+    <div class="loop-box outer">
+      <h4>🔁 Vòng lặp ngoài — Formal Loop</h4>
+      <p style="font-size:.82rem;color:var(--text2);line-height:1.6">
+        Chỉ chạy sau khi Intent pass. Nếu Formal fail → quay về <strong>Node 3</strong> re-gen với error context.<br>
+        Lỗi: timeout ordering, missing Close, balance âm.<br>
+        Max <code style="color:var(--red)">3 retries</code>.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 5 — 4 NODES CHI TIẾT
+══════════════════════════════════════════════════ -->
+<section class="slide" id="slide-nodes">
+  <div class="slide-label">04 · Các Node</div>
+  <h1>4 Agent <span>chuyên biệt</span></h1>
+  <div class="cards">
+    <div class="card">
+      <div class="card-num">N1</div>
+      <h3>Intent Parsing Agent</h3>
+      <ul>
+        <li>LLM đọc hiểu tiếng Việt</li>
+        <li>Extract: parties, shares, deadline, quorum</li>
+        <li>Ghi Intent Snapshot vào Shared State</li>
+        <li>Yêu cầu làm rõ nếu thiếu thông tin</li>
+      </ul>
+    </div>
+    <div class="card amber">
+      <div class="card-num">N2</div>
+      <h3>Game Theory & Logic</h3>
+      <ul>
+        <li>Nash equilibrium · incentive alignment</li>
+        <li>Sinh FSM: states + transitions</li>
+        <li>Định nghĩa invariants cho Node 4</li>
+        <li>Pre-check tổng shares = 1.0</li>
+      </ul>
+    </div>
+    <div class="card purple">
+      <div class="card-num">N3</div>
+      <h3>Marlowe Generator</h3>
+      <ul>
+        <li>Template matching từ thư viện pattern</li>
+        <li>Lắp ghép primitives: When/Pay/Choice</li>
+        <li>Self-check cú pháp trước khi gửi N4</li>
+        <li>Re-gen với error context khi FAIL</li>
+      </ul>
+    </div>
+    <div class="card red">
+      <div class="card-num">N4</div>
+      <h3>Verifier — Static Analyzer</h3>
+      <ul>
+        <li>All branches → Close check</li>
+        <li>Timeout ordering (Marlowe spec §4.2)</li>
+        <li>RAG lookup → cite source vào log</li>
+        <li>3-layer error: machine/dev/user</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 6 — INTENT ALIGNMENT CHECKER
+══════════════════════════════════════════════════ -->
+<section class="slide" id="slide-intent">
+  <div class="slide-label">05 · Intent Alignment</div>
+  <h1>Contract đúng spec<br><span>≠ đúng ý định</span></h1>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1">
+    <div>
+      <p style="font-size:.82rem;color:var(--text2);margin-bottom:14px;line-height:1.6">
+        AST Walker duyệt Marlowe AST, extract 4 nhóm tham số, so sánh với Intent Snapshot:
+      </p>
+      <table class="compare-table">
+        <thead>
+          <tr><th>Check</th><th>Rule</th><th>Tolerance</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Parties count</td><td>parties_count == len(AST.parties)</td><td>Exact</td></tr>
+          <tr><td>Chairman share</td><td>max(Pay)/total ≈ chairman_share</td><td>±1%</td></tr>
+          <tr><td>Deadline</td><td>min(timeout) ≈ days × 86400 slot</td><td>±2 ngày</td></tr>
+          <tr><td>Quorum</td><td>choice_bounds → ratio == quorum</td><td>Exact</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div>
+      <div class="code-block" style="height:100%">
+<span class="cm"># Error report gửi về Node 2</span>
+{
+  <span class="st">"field"</span>: <span class="st">"chairman_share"</span>,
+  <span class="st">"expected"</span>: <span class="ok">0.60</span>,
+  <span class="st">"got"</span>: <span class="err">0.50</span>,
+  <span class="st">"rule"</span>: <span class="st">"tolerance ±0.01"</span>,
+  <span class="st">"message"</span>: <span class="st">"Tỷ lệ Chủ tịch kỳ vọng
+  0.60, AST cho 0.50"</span>
+}
+
+<span class="cm"># Node 2 nhận delta → re-gen</span>
+<span class="cm"># với constraint bổ sung</span>
+
+<span class="cm"># Chỉ sau khi INTENT PASS</span>
+<span class="cm"># mới chạy formal checker</span>
+<span class="ok">→ Tiết kiệm compute tối đa</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 7 — RAG PIPELINE NODE 4
+══════════════════════════════════════════════════ -->
+<section class="slide" id="slide-rag">
+  <div class="slide-label">06 · RAG Pipeline</div>
+  <h1>Node 4 lấy luật<br>từ <span>nguồn uy tín</span></h1>
+  <p class="sub" style="margin-bottom:16px">Không crawl web. Không dùng knowledge ngoài whitelist. Mọi quyết định đều có nguồn trích dẫn.</p>
+  <div class="rag-grid" style="flex:1">
+    <div class="rag-col">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Whitelist Sources</div>
+      <div class="rag-item"><div class="ri-label">Isabelle/HOL</div>Marlowe formal semantics — IOHK GitHub</div>
+      <div class="rag-item"><div class="ri-label">PDF Spec</div>Cardano Ledger Specification — iohk.io</div>
+      <div class="rag-item"><div class="ri-label">Markdown</div>CIP-0030 · CIP-0055 · Plutus Core Spec</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin:14px 0 6px">Rich Metadata / chunk</div>
+      <div class="code-block" style="font-size:.72rem">
+<span class="st">"type"</span>: <span class="ok">"lemma"</span>
+<span class="st">"symbol"</span>: <span class="ok">"Timeout"</span>
+<span class="st">"section"</span>: <span class="ok">"§4.2"</span>
+<span class="st">"valid_from"</span>: <span class="ok">"2024-01"</span>
+<span class="st">"trusted"</span>: <span class="ok">true</span>
+<span class="st">"depends_on"</span>: [<span class="ok">"hash_B"</span>]
+<span class="st">"hash"</span>: <span class="ok">"a3f9..."</span>
+      </div>
+    </div>
+    <div class="rag-arrow-col">
+      <span style="color:var(--text3)">chunk</span>
+      <span>↓</span>
+      <span style="color:var(--text3)">embed</span>
+      <span>↓</span>
+      <span style="color:var(--accent)">Qdrant</span>
+    </div>
+    <div class="rag-col">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Hybrid Retrieval (runtime)</div>
+      <div class="rag-item"><div class="ri-label">Step 1</div><strong>Vector similarity</strong> — semantic search</div>
+      <div class="rag-item"><div class="ri-label">Step 2</div><strong>Symbol filter</strong> — trusted=true AND symbol IN [Timeout, Pay, …]</div>
+      <div class="rag-item"><div class="ri-label">Step 3</div><strong>Dependency fetch</strong> — pull chunks mà kết quả depends_on</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:.62rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin:14px 0 6px">3-Layer Error Output</div>
+      <div class="code-block" style="font-size:.72rem">
+<span class="cm">Machine:</span>  <span class="err">FAIL §4.2 timeout_ord</span>
+<span class="cm">Developer:</span> <span class="st">"Timeout must be strictly
+          increasing"</span>
+<span class="cm">User:</span>     <span class="ok">"Thời hạn hợp đồng
+          bị đặt sai thứ tự"</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 8 — SHARED STATE & AUDIT LOG
+══════════════════════════════════════════════════ -->
+<section class="slide" id="slide-state">
+  <div class="slide-label">07 · Shared State & Audit</div>
+  <h1>Mọi quyết định<br>đều <span>có dấu vết</span></h1>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1">
+    <div>
+      <p style="font-size:.8rem;color:var(--text2);margin-bottom:10px">Shared State — trung tâm pipeline:</p>
+      <div class="code-block">
+<span class="kw">class</span> <span class="fn">SharedState</span>:
+  session_id: str
+  status: PipelineStatus
+  raw_input: str
+  <span class="hl">intent_snapshot: IntentSnapshot</span>
+  blueprint: dict
+  <span class="hl">marlowe_code: str</span>
+  marlowe_ast: dict
+  back_translation: str
+  intent_retry_count: int
+  formal_retry_count: int
+  <span class="hl">logs: list[LogEntry]</span>
+  contract_id: str
+  tx_hash: str
+      </div>
+    </div>
+    <div>
+      <p style="font-size:.8rem;color:var(--text2);margin-bottom:10px">Log entry mỗi Node emit:</p>
+      <div class="code-block">
+<span class="cm">=== Audit Trail ===</span>
+
+[node_1] → <span class="ok">PASS</span>
+  • Parsed: 4 parties
+  • chairman_share=0.60
+  • ↳ rule: intent_snapshot
+
+[alignment_checker] → <span class="ok">PASS</span>
+  • parties_count=4 ✓
+  • chairman_share=0.60 ✓
+  • deadline=2592000 slot ✓
+
+[node_4] → <span class="ok">PASS</span>
+  • Formal check: 0 lỗi
+  • ↳ Marlowe spec §4.2
+  • ↳ Ledger balance rule
+
+<span class="cm">Hash lên Cardano trước Sign</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 9 — STACK KỸ THUẬT
+══════════════════════════════════════════════════ -->
+<section class="slide" id="slide-stack">
+  <div class="slide-label">08 · Stack kỹ thuật</div>
+  <h1>Project <span>Structure</span></h1>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1">
+    <div>
+      <div class="code-block" style="height:100%">
+cardano-dao-agent/
+├── <span class="kw">api/</span>
+│   ├── main.py        <span class="cm"># FastAPI endpoints</span>
+│   └── index.html     <span class="cm"># Demo UI</span>
+├── <span class="kw">nodes/</span>
+│   ├── shared_state.py
+│   ├── node1_intent.py
+│   ├── node2_logic.py
+│   ├── node3_marlowe.py
+│   ├── node4_verifier.py
+│   └── pipeline.py    <span class="cm"># Orchestrator</span>
+├── <span class="kw">alignment/</span>
+│   └── intent_checker.py
+├── <span class="kw">rag/</span>
+│   ├── ingest.py      <span class="cm"># Offline</span>
+│   └── retriever.py   <span class="cm"># Runtime</span>
+├── <span class="kw">scripts/</span>
+│   └── deploy.py      <span class="cm"># Testnet</span>
+├── docker-compose.yml
+├── Dockerfile
+└── .env
+      </div>
+    </div>
+    <div class="cards" style="flex-direction:column;gap:10px">
+      <div class="card">
+        <h3>Backend</h3>
+        <p>Python 3.11 · FastAPI · Pydantic · Uvicorn</p>
+      </div>
+      <div class="card purple">
+        <h3>LLM</h3>
+        <p>Anthropic Claude Sonnet 4 — Node 1, 2, 3, back-translation</p>
+      </div>
+      <div class="card">
+        <h3>RAG</h3>
+        <p>Qdrant (Docker) · bge-m3 embedding · hybrid filter</p>
+      </div>
+      <div class="card green">
+        <h3>Cardano</h3>
+        <p>PyCardano · Marlowe Runtime REST · Blockfrost · Preview Testnet</p>
+      </div>
+      <div class="card amber">
+        <h3>Infra</h3>
+        <p>Docker Compose — chạy Windows 11, Mac, Linux</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 10 — HƯỚNG DẪN CHẠY
+══════════════════════════════════════════════════ -->
+<section class="slide" id="slide-run">
+  <div class="slide-label">09 · Hướng dẫn chạy</div>
+  <h1>Chạy trong<br><span>15 phút</span></h1>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1">
+    <div class="steps">
+      <div class="step-row">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Cài Docker Desktop</h4>
+          <p>docker.com → Windows 11 → bật WSL2 integration</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Cấu hình .env</h4>
+          <p>Copy <code>.env.example</code> → <code>.env</code><br>Điền <code>ANTHROPIC_API_KEY</code> và <code>BLOCKFROST_PROJECT_ID</code></p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Khởi động</h4>
+          <p><code>docker-compose up --build</code><br>→ API: localhost:8000 · Qdrant: localhost:6333</p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">4</div>
+        <div class="step-content">
+          <h4>Ingest Marlowe spec</h4>
+          <p>Đặt file spec vào <code>specs/</code><br><code>docker-compose exec api python rag/ingest.py</code></p>
+        </div>
+      </div>
+      <div class="step-row">
+        <div class="step-num">5</div>
+        <div class="step-content">
+          <h4>Lấy tADA & Deploy testnet</h4>
+          <p>Faucet: docs.cardano.org → Preview network<br>Nami Wallet → Settings → Preview Testnet</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="code-block" style="height:100%">
+<span class="cm"># 1. Clone và setup</span>
+<span class="kw">cd</span> cardano-dao-agent
+<span class="kw">copy</span> .env.example .env
+<span class="cm"># Điền API keys vào .env</span>
+
+<span class="cm"># 2. Chạy</span>
+docker-compose up --build
+
+<span class="cm"># 3. Test API</span>
+curl -X POST localhost:8000/generate \
+  -d '{<span class="st">"user_input"</span>: <span class="st">"Tạo hợp đồng
+  DAO: Chủ tịch 60%, 3 thành viên
+  13.3%, deadline 30 ngày"</span>}'
+
+<span class="cm"># 4. Ingest specs</span>
+docker-compose exec api \
+  python rag/ingest.py
+
+<span class="cm"># 5. Xem demo UI</span>
+<span class="ok">→ http://localhost:8000</span>
+<span class="ok">→ http://localhost:8000/docs</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 12 — CHECKLIST ĐI THI
+══════════════════════════════════════════════════ -->
+<section class="slide" id="slide-checklist">
+  <div class="slide-label">10 · Checklist</div>
+  <h1>Sẵn sàng<br><span>đi thi</span></h1>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;flex:1">
+    <div>
+      <p style="font-size:.78rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">T-3 ngày — Technical</p>
+      <div class="checklist">
+        <div class="check-item"><span class="check-icon">✅</span><div><strong>Docker compose up không lỗi</strong><span>/health trả về 200</span></div></div>
+        <div class="check-item"><span class="check-icon">✅</span><div><strong>Test 3 input khác nhau</strong><span>DAO · Escrow · Multi-sig</span></div></div>
+        <div class="check-item"><span class="check-icon">✅</span><div><strong>1 contract deployed thật</strong><span>Có tx_hash thật trên Preview Testnet</span></div></div>
+        <div class="check-item"><span class="check-icon">✅</span><div><strong>RAG ingest spec xong</strong><span>Qdrant có data, Node 4 cite được source</span></div></div>
+        <div class="check-item"><span class="check-icon">✅</span><div><strong>Audit trail hiển thị đầy đủ</strong><span>Mọi node log reasoning + rule cited</span></div></div>
+      </div>
+    </div>
+    <div>
+      <p style="font-size:.78rem;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">T-1 ngày — Demo prep</p>
+      <div class="checklist">
+        <div class="check-item"><span class="check-icon">✅</span><div><strong>tADA trong ví Nami</strong><span>Faucet: docs.cardano.org → Preview</span></div></div>
+        <div class="check-item"><span class="check-icon">✅</span><div><strong>Chuẩn bị 3 input hay</strong><span>Viết sẵn, copy paste khi demo</span></div></div>
+        <div class="check-item"><span class="check-icon">✅</span><div><strong>Screenshot Marlowe Scan sẵn</strong><span>Backup nếu testnet lag</span></div></div>
+        <div class="check-item"><span class="check-icon">✅</span><div><strong>Swagger UI /docs sẵn sàng</strong><span>Demo live API endpoint</span></div></div>
+        <div class="check-item"><span class="check-icon">✅</span><div><strong>Pre-deployed contract ID backup</strong><span>Show audit trail thay vì live deploy</span></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════════════
+     SLIDE 13 — FINAL PITCH
+══════════════════════════════════════════════════ -->
+<section class="slide" id="slide-final">
+  <div class="slide-label">11 · Câu chốt</div>
+  <h1>Không phải <span>AI đoán</span>.<br>Là <span class="glow-text">proof</span>.</h1>
+  <div class="pitch-quote" style="max-width:720px">
+    "Our system does <em>not</em> rely on LLM correctness.<br>
+    Correctness is enforced through <em>formal verification</em><br>
+    against versioned Marlowe specifications.<br>
+    Intent is guaranteed by comparing the generated contract<br>
+    back to the user's original <em>business requirements</em>.<br>
+    LLM is used for interpretation — <em>not for final verification</em>."
+  </div>
+  <div class="tech-pills" style="margin-top:24px">
+    <span class="pill">Formal Verification</span>
+    <span class="pill">Intent Alignment</span>
+    <span class="pill">Hybrid RAG</span>
+    <span class="pill">Full Audit Trail</span>
+    <span class="pill">On-chain Proof</span>
+  </div>
+</section>
+
+</div><!-- #deck -->
+
+<!-- ── NAVIGATION ── -->
+<nav id="nav">
+  <button onclick="prev()">← Prev</button>
+  <div class="dot-row" id="dots"></div>
+  <span id="slide-counter">1 / 13</span>
+  <button onclick="next()">Next →</button>
+</nav>
+
+<script>
+const slides = document.querySelectorAll('.slide');
+const dotsEl = document.getElementById('dots');
+const counter = document.getElementById('slide-counter');
+let cur = 0;
+
+// Build dots
+slides.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' on' : '');
+  d.onclick = () => goTo(i);
+  dotsEl.appendChild(d);
+});
+
+function goTo(n) {
+  if (n === cur) return;
+  slides[cur].classList.remove('active');
+  slides[cur].classList.add('exit');
+  setTimeout(() => slides[cur > n ? cur : cur].classList.remove('exit'), 500);
+
+  const prev2 = cur;
+  cur = Math.max(0, Math.min(n, slides.length - 1));
+
+  slides[prev2].classList.remove('active');
+  slides[cur].classList.add('active');
+
+  document.querySelectorAll('.dot').forEach((d, i) => {
+    d.className = 'dot' + (i === cur ? ' on' : '');
+  });
+  counter.textContent = `${cur + 1} / ${slides.length}`;
+}
+
+function next() { goTo(cur + 1); }
+function prev() { goTo(cur - 1); }
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+  if (e.key === 'ArrowLeft')  { e.preventDefault(); prev(); }
+  if (e.key === 'Home') goTo(0);
+  if (e.key === 'End')  goTo(slides.length - 1);
+});
+
+// Swipe support
+let tx = 0;
+document.addEventListener('touchstart', e => tx = e.touches[0].clientX);
+document.addEventListener('touchend',   e => {
+  const dx = e.changedTouches[0].clientX - tx;
+  if (Math.abs(dx) > 50) dx < 0 ? next() : prev();
+});
+</script>
+</body>
+</html>
