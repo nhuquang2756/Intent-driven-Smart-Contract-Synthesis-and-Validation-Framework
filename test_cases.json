@@ -1,0 +1,182 @@
+[
+  {
+    "id": 1,
+    "name": "Escrow cơ bản",
+    "input": "Tôi muốn tạo hợp đồng escrow giữa Người mua và Người bán. Người mua gửi 500 ADA, Người bán xác nhận giao hàng thì nhận tiền, nếu sau 7 ngày không xác nhận thì hoàn tiền.",
+    "expected_type": "escrow"
+  },
+  {
+    "id": 2,
+    "name": "Escrow giá trị cao",
+    "input": "Hợp đồng mua bán bất động sản kỹ thuật số giữa Bên Bán và Bên Mua. Bên Mua đặt cọc 10000 ADA. Bên Bán chuyển tài sản trong 30 ngày thì nhận tiền, không thì hoàn cọc.",
+    "expected_type": "escrow"
+  },
+  {
+    "id": 3,
+    "name": "Bỏ phiếu 3/5",
+    "input": "Ban chấp hành 5 người cần bỏ phiếu. Chủ tịch nạp 2000 ADA vào quỹ. Cần 3/5 thành viên đồng ý thì giải ngân cho dự án. Sau 30 ngày nếu không đủ phiếu thì hoàn tiền.",
+    "expected_type": "multisig_vote"
+  },
+  {
+    "id": 4,
+    "name": "Bỏ phiếu 2/3",
+    "input": "Nhóm 3 người quyết định chi tiêu quỹ nghiên cứu 1500 ADA. Cần 2 người đồng ý mới được rút. Hạn 14 ngày.",
+    "expected_type": "multisig_vote"
+  },
+  {
+    "id": 5,
+    "name": "Vay có lãi suất",
+    "input": "Hợp đồng vay giữa Bên Cho Vay và Bên Vay. Cho vay 1000 ADA, lãi suất 5%, hoàn trả 1050 ADA trong 30 ngày. Quá hạn thì mất thế chấp.",
+    "expected_type": "loan"
+  },
+  {
+    "id": 6,
+    "name": "Vay không lãi",
+    "input": "Bạn bè vay mượn: An cho Bình vay 200 ADA không lãi, hoàn trả trong 14 ngày.",
+    "expected_type": "loan"
+  },
+  {
+    "id": 7,
+    "name": "Quỹ DAO sinh viên",
+    "input": "Quỹ nghiên cứu nhóm sinh viên. Giảng viên nạp 3000 ADA. Nhóm trưởng đề xuất chi tiêu, cần 2 thành viên xác nhận, mỗi lần rút tối đa 500 ADA. Sau 6 tháng hoàn quỹ.",
+    "expected_type": "dao_fund"
+  },
+  {
+    "id": 8,
+    "name": "Quỹ dự án",
+    "input": "Công ty A lập quỹ dự án 5000 ADA, 3 trưởng bộ phận có quyền chi tiêu khi được CEO duyệt. Cuối năm phân chia phần còn lại.",
+    "expected_type": "dao_fund"
+  },
+  {
+    "id": 9,
+    "name": "Escrow dịch vụ freelance",
+    "input": "Thuê freelancer làm website. Khách hàng gửi 800 ADA vào escrow. Freelancer hoàn thành và khách hàng chấp nhận thì nhận tiền. Nếu 21 ngày không xong thì hoàn tiền.",
+    "expected_type": "escrow"
+  },
+  {
+    "id": 10,
+    "name": "Escrow mua NFT",
+    "input": "Mua bán NFT giữa Người Mua và Người Bán. Giá 300 ADA. Người Bán chuyển NFT thì nhận ADA. Nếu 3 ngày không chuyển thì hủy và hoàn tiền.",
+    "expected_type": "escrow"
+  },
+  {
+    "id": 11,
+    "name": "Bỏ phiếu đơn giản",
+    "input": "Hai người cùng đồng ý thì mới giải ngân 400 ADA cho mục đích chung.",
+    "expected_type": "multisig_vote"
+  },
+  {
+    "id": 12,
+    "name": "Vay trả nhiều đợt",
+    "input": "Vay 500 ADA, trả làm 2 đợt: 250 ADA sau 15 ngày và 250 ADA sau 30 ngày.",
+    "expected_type": "loan"
+  },
+  {
+    "id": 13,
+    "name": "Quỹ khẩn cấp",
+    "input": "Quỹ dự phòng khẩn cấp 1000 ADA cho nhóm 4 người. Cần 3 người đồng ý mới được dùng. Không sử dụng sau 1 năm thì chia đều.",
+    "expected_type": "dao_fund"
+  },
+  {
+    "id": 14,
+    "name": "Escrow thuê nhà",
+    "input": "Đặt cọc thuê nhà 600 ADA. Chủ nhà xác nhận hợp đồng thuê thì nhận cọc. Nếu 7 ngày không xác nhận thì hoàn cọc.",
+    "expected_type": "escrow"
+  },
+  {
+    "id": 15,
+    "name": "Bỏ phiếu hội đồng",
+    "input": "Hội đồng quản trị 7 người biểu quyết khoản đầu tư 8000 ADA. Cần tối thiểu 4 phiếu thuận trong 10 ngày.",
+    "expected_type": "multisig_vote"
+  },
+  {
+    "id": 16,
+    "name": "Escrow mô tả đơn giản",
+    "input": "A trả tiền cho B khi B giao hàng. 100 ADA. Hạn 5 ngày.",
+    "expected_type": "escrow"
+  },
+  {
+    "id": 17,
+    "name": "Vay học phí",
+    "input": "Hỗ trợ học phí: Thầy cho Trò vay 400 ADA không lãi để đóng học phí. Trò hoàn trả sau khi có việc làm hoặc tối đa 12 tháng.",
+    "expected_type": "loan"
+  },
+  {
+    "id": 18,
+    "name": "Quỹ giải thưởng",
+    "input": "Quỹ giải thưởng cuộc thi 2000 ADA. Ban giám khảo 3 người chọn người thắng bằng cách bỏ phiếu. Người có 2 phiếu trở lên nhận giải. Hạn 7 ngày.",
+    "expected_type": "multisig_vote"
+  },
+  {
+    "id": 19,
+    "name": "Escrow phức tạp có tranh chấp",
+    "input": "Mua bán hàng hóa 750 ADA. Người mua gửi tiền. Người bán giao hàng. Nếu có tranh chấp thì 2 bên cần đồng ý hòa giải, không thì đưa ra trọng tài Mediator quyết định sau 14 ngày.",
+    "expected_type": "escrow"
+  },
+  {
+    "id": 20,
+    "name": "DAO phân phối theo tỷ lệ",
+    "input": "Quỹ chung 6000 ADA của 3 thành viên đóng góp đều nhau. Cuối kỳ phân chia lợi nhuận 60-25-15 cho Thành Viên A, B, C. Hạn 90 ngày.",
+    "expected_type": "dao_fund"
+  },
+  {
+    "id": 21,
+    "name": "Escrow dịch vụ thiết kế",
+    "input": "Đặt cọc dịch vụ thiết kế logo 250 ADA. Designer giao file và Client duyệt thì nhận tiền. 10 ngày không giao thì hoàn cọc.",
+    "expected_type": "escrow"
+  },
+  {
+    "id": 22,
+    "name": "Vay cầm đồ",
+    "input": "Cầm đồ kỹ thuật số: Người cầm đồ đặt tài sản token, nhận 300 ADA. Sau 30 ngày hoàn 315 ADA thì lấy lại tài sản. Quá hạn mất tài sản.",
+    "expected_type": "loan"
+  },
+  {
+    "id": 23,
+    "name": "Bỏ phiếu thay đổi quy tắc",
+    "input": "Cộng đồng 10 thành viên bỏ phiếu thay đổi quy tắc. Cần 6/10 đồng ý. Có 500 ADA phí tổ chức bỏ phiếu từ quỹ chung.",
+    "expected_type": "multisig_vote"
+  },
+  {
+    "id": 24,
+    "name": "Escrow milestone",
+    "input": "Thanh toán dự án phần mềm theo milestone. Tổng 1200 ADA. Bàn giao giai đoạn 1 nhận 600 ADA, bàn giao giai đoạn 2 nhận 600 ADA còn lại. Hạn mỗi giai đoạn 20 ngày.",
+    "expected_type": "escrow"
+  },
+  {
+    "id": 25,
+    "name": "Quỹ học bổng",
+    "input": "Quỹ học bổng 5000 ADA. Hội đồng 5 người xét duyệt. Sinh viên nộp đơn, cần 3 phiếu hội đồng mới nhận được học bổng 500 ADA/người. Hạn xét duyệt 30 ngày.",
+    "expected_type": "dao_fund"
+  },
+  {
+    "id": 26,
+    "name": "Escrow cho thuê thiết bị",
+    "input": "Thuê thiết bị 180 ADA/tuần. Người thuê đặt cọc, dùng xong trả thiết bị thì nhận lại cọc. Nếu thiết bị bị hỏng giữ cọc.",
+    "expected_type": "escrow"
+  },
+  {
+    "id": 27,
+    "name": "Vay tín chấp ngắn hạn",
+    "input": "Cho vay tín chấp 200 ADA trong 7 ngày, lãi suất 2%.",
+    "expected_type": "loan"
+  },
+  {
+    "id": 28,
+    "name": "Bỏ phiếu khẩn cấp",
+    "input": "Quyết định khẩn cấp: 2 trong 3 admin đồng ý có thể giải ngân quỹ dự phòng 1000 ADA. Không có thời hạn cố định.",
+    "expected_type": "multisig_vote"
+  },
+  {
+    "id": 29,
+    "name": "Escrow đấu giá đơn giản",
+    "input": "Bán vật phẩm kỹ thuật số, giá khởi điểm 50 ADA. Người trả cao nhất sau 3 ngày thắng. Người thắng chuyển tiền nhận vật phẩm.",
+    "expected_type": "escrow"
+  },
+  {
+    "id": 30,
+    "name": "DAO quản lý ngân sách",
+    "input": "Ngân sách dự án nhóm 4000 ADA. Mỗi thành viên được đề xuất chi tiêu. Trưởng nhóm duyệt đề xuất dưới 200 ADA, cần 2 người duyệt cho 200-500 ADA, cần tất cả cho trên 500 ADA.",
+    "expected_type": "dao_fund"
+  }
+]

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MarloweAI - Intelligent Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@300;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-dark: #020617;
+            --card-bg: rgba(15, 23, 42, 0.7);
+            --primary-purple: #8b5cf6;
+            --primary-blue: #3b82f6;
+            --neon-cyan: #06b6d4;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Urbanist', sans-serif;
+            overflow-x: hidden;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(139, 92, 246, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.15) 0%, transparent 40%);
+        }
+
+        .app-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+            padding: 40px;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .sidebar {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border-radius: 35px;
+            padding: 30px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            height: fit-content;
+        }
+
+        h2 { font-size: 24px; margin-bottom: 20px; color: var(--primary-purple); }
+
+        .test-case-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .test-case-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .test-case-item:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: var(--primary-purple);
+            transform: translateX(5px);
+        }
+
+        .test-case-item.active {
+            background: linear-gradient(90deg, var(--primary-purple), var(--primary-blue));
+            border-color: white;
+        }
+
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+
+        .header-section {
+            text-align: left;
+            margin-bottom: 10px;
+        }
+
+        .header-section h1 {
+            font-size: 42px;
+            background: linear-gradient(to right, #fff, var(--primary-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .input-box {
+            background: var(--card-bg);
+            border-radius: 30px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        textarea {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 18px;
+            font-family: inherit;
+            resize: none;
+            height: 100px;
+            outline: none;
+        }
+
+        .btn-generate {
+            align-self: flex-end;
+            background: linear-gradient(90deg, var(--primary-purple), var(--primary-blue));
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            border-radius: 50px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 10px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .btn-generate:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(139, 92, 246, 0.5);
+        }
+
+        .pipeline-viz {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .node-card {
+            background: var(--card-bg);
+            border-radius: 25px;
+            padding: 20px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        .node-card.active {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+        }
+
+        .node-icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+            color: var(--text-dim);
+        }
+
+        .active .node-icon { color: var(--neon-cyan); }
+
+        .output-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .panel {
+            background: var(--card-bg);
+            border-radius: 30px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            min-height: 400px;
+        }
+
+        pre {
+            color: #10b981;
+            font-family: 'Courier New', Courier, monospace;
+            overflow-x: auto;
+            font-size: 14px;
+            max-height: 350px;
+        }
+
+        .loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #fff;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        <div class="sidebar">
+            <h2><i class="fa-solid fa-flask"></i> Test Cases</h2>
+            <div id="test-case-list" class="test-case-list"></div>
+        </div>
+
+        <div class="main-content">
+            <div class="header-section">
+                <h1>MarloweAI Generation</h1>
+                <p style="color: var(--text-dim);">Hệ thống Đa tác vụ AI hỗ trợ khởi tạo Smart Contract an toàn.</p>
+            </div>
+
+            <div class="input-box">
+                <div style="display:flex; justify-content: space-between; align-items:center;">
+                    <span style="font-weight: 500;">Input Intent (Tiếng Việt)</span>
+                    <!-- QUAN TRỌNG: id="api-key" -->
+                    <input type="password" id="api-key" placeholder="Nhập API Key sk-..." style="background:rgba(0,0,0,0.3); border:none; border-radius:10px; padding:5px 15px; color:white; font-size:12px; width: 250px;">
+                </div>
+                <!-- QUAN TRỌNG: id="user-input" -->
+                <textarea id="user-input" placeholder="Chọn một test case hoặc nhập yêu cầu của bạn tại đây..."></textarea>
+                <button class="btn-generate" onclick="generateContract()">
+                    <span id="btn-text">Generate Contract</span>
+                    <div id="loader" class="loader"></div>
+                </button>
+            </div>
+
+            <div class="pipeline-viz">
+                <div class="node-card" id="node-1">
+                    <div class="node-icon"><i class="fa-solid fa-language"></i></div>
+                    <h4>Node 1</h4>
+                    <p style="font-size:12px; color:var(--text-dim);">Intent Parser</p>
+                </div>
+                <div class="node-card" id="node-2">
+                    <div class="node-icon"><i class="fa-solid fa-diagram-project"></i></div>
+                    <h4>Node 2</h4>
+                    <p style="font-size:12px; color:var(--text-dim);">Classifier</p>
+                </div>
+                <div class="node-card" id="node-3">
+                    <div class="node-icon"><i class="fa-solid fa-code"></i></div>
+                    <h4>Node 3</h4>
+                    <p style="font-size:12px; color:var(--text-dim);">Generator</p>
+                </div>
+                <div class="node-card" id="node-4">
+                    <div class="node-icon"><i class="fa-solid fa-shield-check"></i></div>
+                    <h4>Node 4</h4>
+                    <p style="font-size:12px; color:var(--text-dim);">Static Verifier</p>
+                </div>
+            </div>
+
+            <div class="output-grid">
+                <div class="panel">
+                    <h3><i class="fa-solid fa-file-code"></i> Marlowe DSL JSON</h3>
+                    <hr style="margin: 15px 0; border: 0; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <pre id="json-output">// Kết quả hợp đồng sẽ hiển thị tại đây...</pre>
+                </div>
+                <div class="panel">
+                    <h3><i class="fa-solid fa-circle-info"></i> System Logs</h3>
+                    <hr style="margin: 15px 0; border: 0; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <div id="log-content">
+                        <p style="color:var(--text-dim);">Đang chờ lệnh...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const testCases = [
+            { id: 1, name: "Escrow cơ bản", input: "Tôi muốn tạo hợp đồng escrow giữa Người mua và Người bán. Người mua gửi 500 ADA, Người bán xác nhận giao hàng thì nhận tiền, nếu sau 7 ngày không xác nhận thì hoàn tiền." },
+            { id: 2, name: "Vay có lãi suất", input: "Hợp đồng vay: Cho vay 1000 ADA, lãi suất 5%, hoàn trả 1050 ADA trong 30 ngày. Quá hạn thì mất thế chấp." },
+            { id: 3, name: "Quỹ DAO nhóm", input: "Quỹ nhóm sinh viên: Giảng viên nạp 3000 ADA. Nhóm trưởng đề xuất chi tiêu, cần 2 thành viên xác nhận." },
+            { id: 4, name: "Bỏ phiếu đa chữ ký", input: "Nhóm 3 người quyết định chi tiêu 1500 ADA. Cần 2 người đồng ý mới được rút. Hạn 14 ngày." }
+        ];
+
+        const listEl = document.getElementById('test-case-list');
+        testCases.forEach(tc => {
+            const li = document.createElement('div');
+            li.className = 'test-case-item';
+            li.innerHTML = `<strong>${tc.name}</strong><p style="font-size:12px; color:var(--text-dim); margin-top:5px;">${tc.input.substring(0, 50)}...</p>`;
+            li.onclick = () => selectTestCase(tc, li);
+            listEl.appendChild(li);
+        });
+
+        function selectTestCase(tc, el) {
+            document.querySelectorAll('.test-case-item').forEach(item => item.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('user-input').value = tc.input;
+        }
+
+        async function generateContract() {
+            // 1. Lấy dữ liệu và làm sạch (trim) API Key
+            const apiKey = document.getElementById('api-key').value.trim();
+            const userInput = document.getElementById('user-input').value;
+            const logBox = document.getElementById('log-content');
+            
+            if (!userInput || !apiKey) {
+                alert("Vui lòng nhập đầy đủ API Key và Nội dung hợp đồng!");
+                return;
+            }
+
+            // 2. Trạng thái Loading
+            document.getElementById('btn-text').style.display = 'none';
+            document.getElementById('loader').style.display = 'block';
+            resetNodes();
+            activateNode(1);
+            logBox.innerHTML = `<p style="color:var(--neon-cyan);">Đang khởi động Node 1: Intent Parser...</p>`;
+
+            try {
+                // 3. GỌI API (Lưu ý: Bạn hãy kiểm tra xem api.py chạy ở port nào, ví dụ 8000)
+                const response = await fetch('http://127.0.0.1:8000/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        api_key: apiKey, 
+                        user_input: userInput 
+                    })
+                });
+
+                const result = await response.json();
+
+                if (response.ok && result.success) {
+                    // Thành công: Kích hoạt các node theo hiệu ứng
+                    activateNode(2);
+                    logBox.innerHTML += `<p style="color:var(--neon-cyan);">Node 2: Classifier hoàn tất...</p>`;
+                    
+                    setTimeout(() => {
+                        activateNode(3);
+                        logBox.innerHTML += `<p style="color:var(--neon-cyan);">Node 3: Generator đang tạo Marlowe DSL...</p>`;
+                    }, 600);
+
+                    setTimeout(() => {
+                        activateNode(4);
+                        logBox.innerHTML += `<p style="color:#10b981;"><b>Node 4: Static Verifier xác nhận an toàn!</b></p>`;
+                        document.getElementById('json-output').textContent = JSON.stringify(result.contract_json, null, 2);
+                        logBox.innerHTML += `<p style="margin-top:10px; border-top:1px solid #333; padding-top:10px;">${result.summary_vi || 'Hợp đồng đã sẵn sàng.'}</p>`;
+                    }, 1200);
+
+                } else {
+                    // Lỗi trả về từ Backend (VD: API Key sai, AI lỗi...)
+                    const errorMsg = result.detail || result.error || "Lỗi xử lý dữ liệu";
+                    logBox.innerHTML = `<p style="color:#ef4444;"><b>Lỗi hệ thống:</b> ${JSON.stringify(errorMsg)}</p>`;
+                }
+            } catch (error) {
+                // Lỗi kết nối (VD: Chưa bật server api.py)
+                logBox.innerHTML = `<p style="color:#ef4444;"><b>Lỗi kết nối:</b> Không thể kết nối tới Backend tại port 8000. Hãy kiểm tra Terminal!</p>`;
+            } finally {
+                document.getElementById('btn-text').style.display = 'block';
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+
+        function activateNode(id) {
+            document.getElementById(`node-${id}`).classList.add('active');
+        }
+
+        function resetNodes() {
+            for(let i=1; i<=4; i++) document.getElementById(`node-${i}`).classList.remove('active');
+        }
+    </script>
+</body>
+</html>
